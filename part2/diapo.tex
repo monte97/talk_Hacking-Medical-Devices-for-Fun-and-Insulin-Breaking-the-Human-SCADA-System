@@ -1,0 +1,136 @@
+\documentclass{beamer}
+ 
+\usepackage[utf8]{inputenc}
+ 
+ 
+%Information to be included in the title page:
+\title{Hacking Medical Devices for Fun and Insulin: Breaking the Human 
+SCADA System}
+\subtitle{Analisi delle vulnerabilità del sistema CGM}
+\author{Francesco Montelli}
+\institute{CeSeNa}
+\date{2017}
+ 
+ 
+ 
+\begin{document}
+ 
+\frame{\titlepage}
+
+\begin{frame}
+	\frametitle{Analisi delle vulnerabilità del sistema CGM}
+	\begin{itemize}
+		\item Ipotesi
+		\item Analisi
+		\item Esperimenti
+		\item Considerazioni
+		\item Conclusione
+	\end{itemize}
+\end{frame}
+ 
+\begin{frame}
+\frametitle{Ipotesi}
+	\begin{itemize}
+		\item Crittografia?
+		\item Tipo di comunicazione
+		\item Di che cosa ``si rende conto'' il sensore?
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Analisi}
+	\begin{itemize}
+		\item Read the manual
+			\begin{table}
+			\centering
+			\begin{tabular}{ll}
+				Transmitter/Reciver Frequency & 402.142 MHz            \\
+				Bandwidth                     & 300 KHz                \\
+				Modulation                    & On-Off Key             \\
+				Data Rate                     & 8192 bits/Sec          \\
+				Total Packt                   & 76 bit                 \\
+				Transmit Duty Cycle           & 9.28 ms evry 5 minutes                           
+			\end{tabular}
+			\end{table}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Analisi}
+	\begin{itemize}
+		\item FCC Recon Research
+		\item Brevetti
+		\item Smontare il CGM
+			\begin{itemize}
+				\item Nome del chip visibile (AMIS 52100M)
+				\item Stesso chip usato in ambienti SCADA
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Esperimenti - How to Listen}
+	\begin{itemize}
+		\item Arduino
+		\item Problemi
+			\begin{itemize}
+				\item Tanti registri (80+)
+				\item Tante impostazioni
+				\item Chip fuori produzione -> nessun supporto del produttore
+			\end{itemize}
+		\item Scoperte
+			\begin{itemize}
+				\item Nessun controllo di consistenza ai valori assegnati ai registri
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Esperimenti - CGM Signal Dissection}
+	\begin{itemize}
+		\item Modulazione OOK
+		\item Segnale = 1, Nessun sengale = 0
+		\item 8192 bits/sec * 9ms = circa 76bit 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Esperimenti - CGM Signal Dissection}
+	\begin{itemize}
+		\item Modulazione OOK
+		\item Segnale = 1, Nessun sengale = 0
+		\item 8192 bits/sec * 9ms = circa 76bit 
+		\item Parametri richiesti per comunicare
+			\begin{itemize}
+				\item Preambolo (non menzionato nel datasheet)
+				\item Sync Word: parola per autorizzare la comunicazione, impostata nel costruttore
+				\ite CRC 
+			\end{itemize}
+		\item Direct Mode 
+		\item Raccolta manuale dei pacchetti e realtiva decodifica
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Considerazioni finali}
+	\begin{itemize}
+		\item Troppe combinazioni di impostazioni, impossibile avere un controllo fine 
+		\item Nessuna documentazione utilizzabile
+		\item Nessuna esprienza d'uso in questa modalità
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conclusioni - Rischi per la sicurezza}
+	\begin{itemize}
+		\item Replay Attack
+		\item DOS
+		\item Ogni attacco ideato risulterebbe in una semplice interruzione di servizio, nulla di grave considerando che si può tranquillamente misurare con il sangue
+		\item Necessità di trovarsi vicino al bersaglio considerando la natura della trasmissione 
+	\end{itemize}
+\end{frame}
+
+
+
+\end{document}
+
